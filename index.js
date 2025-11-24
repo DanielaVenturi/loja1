@@ -37,3 +37,17 @@ app.get("/tarefas", async (req, res) => {
 
     res.json(data);
 });
+
+app.get("/tarefas/:id", async (req, res) => {
+    const { id } = req.params;
+
+    const { data, error } = await supabase
+        .from("tarefas")
+        .select("*")
+        .eq("id", id)
+        .single(); 
+
+    if (error) return res.status(400).json({ error: error.message });
+
+    res.json(data);
+});
