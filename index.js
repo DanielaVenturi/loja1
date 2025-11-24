@@ -51,3 +51,20 @@ app.get("/tarefas/:id", async (req, res) => {
 
     res.json(data);
 });
+
+app.put("/tarefas/:id", async (req, res) => {
+    const { id } = req.params;
+    const { nome, descricao, data, nivel, status } = req.body;
+
+    const { data: updated, error } = await supabase
+        .from("tarefas")
+        .update([{ nome, descricao, data, nivel, status }])
+        .eq("id", id);
+
+    if (error) return res.status(400).json({ error: error.message });
+
+    res.json({
+        message: `Tarefa ${id} atualizada com sucesso!`,
+        updated
+    });
+});
