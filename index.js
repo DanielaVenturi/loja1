@@ -27,3 +27,13 @@ app.post("/tarefas", async (req, res) => {
 
     res.status(200).json({ message: "Tarefa criada com sucesso!" });
 });
+
+app.get("/tarefas", async (req, res) => {
+    const { data, error } = await supabase
+        .from("tarefas")
+        .select("*");
+
+    if (error) return res.status(400).json({ error: error.message });
+
+    res.json(data);
+});
