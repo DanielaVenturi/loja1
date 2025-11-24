@@ -68,3 +68,20 @@ app.put("/tarefas/:id", async (req, res) => {
         updated
     });
 });
+
+app.delete("/tarefas/:id", async (req, res) => {
+    const { id } = req.params;
+
+    const { error } = await supabase
+        .from("tarefas")
+        .delete()
+        .eq("id", id);
+
+    if (error) return res.status(400).json({ error: error.message });
+
+    res.json({ message: `Tarefa ${id} deletada com sucesso!` });
+});
+
+app.listen(3000, () => {
+    console.log("Servidor rodando na porta 3000");
+});
