@@ -16,87 +16,72 @@ app.use(cors());
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
-// Criar produto
-app.post("/produtos", async (req, res) => {
-    const { nome, preco, categoria } = req.body;
+app.post("/tarefas", async (req, res) => {
+    const { nome, descricao, data, nivel, status } = req.body;
 
-    const { data, error } = await supabase
-        .from("produtos")
-        .insert([{ nome, preco, categoria }]);
+    const { error } = await supabase
+        .from("tarefas")
+        .insert([{ nome, descricao, data, nivel, status }]);
 
-    if (error) {
-        return res.status(400).json({ error: error.message });
-    }
+    if (error) return res.status(400).json({ error: error.message });
 
-    res.status(200).json({ message: "Produto criado com sucesso!" });
+    res.status(200).json({ message: "Tarefa criada com sucesso!" });
 });
 
-// Listar produtos
-app.get("/produtos", async (req, res) => {
+app.get("/tarefas", async (req, res) => {
     const { data, error } = await supabase
-        .from("produtos")
+        .from("tarefas")
         .select("*");
 
-    if (error) {
-        return res.status(400).json({ error: error.message });
-    }
+    if (error) return res.status(400).json({ error: error.message });
 
     res.json(data);
 });
 
-// Deletar produto
-app.delete("/produtos/:id", async (req, res) => {
+app.get("/tarefas/:id", async (req, res) => {
     const { id } = req.params;
 
     const { data, error } = await supabase
-        .from("produtos")
-        .delete()
-        .eq("id", id);
+        .from("tarefas")
+        .select("*")
+        .eq("id", id)
+        .single(); 
 
-    if (error) {
-        return res.status(400).json({ error: error.message });
-    }
+    if (error) return res.status(400).json({ error: error.message });
 
     res.json(data);
 });
 
-// Atualizar produto
-app.put("/produtos/:id", async (req, res) => {
+app.put("/tarefas/:id", async (req, res) => {
     const { id } = req.params;
-    const { nome, preco, categoria } = req.body;
+    const { nome, descricao, data, nivel, status } = req.body;
 
-    const { data, error } = await supabase
-        .from("produtos")
-        .update([{ nome, preco, categoria }])
+    const { data: updated, error } = await supabase
+        .from("tarefas")
+        .update([{ nome, descricao, data, nivel, status }])
         .eq("id", id);
 
-    if (error) {
-        return res.status(400).json({ error: error.message });
-    }
+    if (error) return res.status(400).json({ error: error.message });
 
-    res.status(200).json({
-        message: `Produto com id ${id} atualizado com sucesso!`,
-        data
+    res.json({
+        message: `Tarefa ${id} atualizada com sucesso!`,
+        updated
     });
 });
 
-// Buscar um produto por ID
-app.get("/produtos/:id", async (req, res) => {
+app.delete("/tarefas/:id", async (req, res) => {
     const { id } = req.params;
 
-    const { data, error } = await supabase
-        .from("produtos")
-        .select("*")
+    const { error } = await supabase
+        .from("tarefas")
+        .delete()
         .eq("id", id);
 
-    if (error) {
-        return res.status(400).json({ error: error.message });
-    }
+    if (error) return res.status(400).json({ error: error.message });
 
-    res.json(data);
+    res.json({ message: `Tarefa ${id} deletada com sucesso!` });
 });
 
-// Subir servidor
 app.listen(3000, () => {
-    console.log("O servidor subiu na porta 3000");
+    console.log("Servidor rodando na porta 3000");
 });
